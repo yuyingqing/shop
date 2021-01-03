@@ -19,7 +19,7 @@ public class Test {
             for (int i = 0; i < users.length; i++) {
                 if (username.equals(users[i].getUsername()) && password.equals(users[i].getPassword())) {
                     System.out.println("登录成功");
-                    ReadProductExcel readProductExcel=new ReadProductExcel();
+                   ReadProductExcel readProductExcel=new ReadProductExcel();
                     Product products[]=readProductExcel.readExcel(inPro);
                     for(Product product:products){
                         System.out.print(product.getpId());
