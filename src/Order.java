@@ -2,8 +2,9 @@ import java.util.Date;
 
 public class Order {
     private User user;
-    private Product product;
-    private int ProductAmmount;
+    //private Product product;//1个商品
+    private Product products[];//多个商品
+    private int ProductAmmount;//购买商品数量
     private float totalPrice;
     private float finalPay;
     private Date orderDate;
@@ -12,16 +13,16 @@ public class Order {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(User user) {//把订单和用户关联
         this.user = user;
     }
 
-    public Product getProduct() {
-        return product;
+    public Product[] getProducts() {
+        return products;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProducts(Product[] products) {
+        this.products = products;
     }
 
     public int getProductAmmount() {
