@@ -1,19 +1,22 @@
-import java.util.Date;
+import java.sql.Date;
 
 public class Order {
+    /*
+    该有哪些属性？依据是什么？
+    依据：数据库有哪些字段，那么类就有哪些属性
+     */
     private User user;
-    //private Product product;//1个商品
-    private Product products[];//多个商品
-    private int ProductAmmount;//购买商品数量
-    private float totalPrice;
-    private float finalPay;
+    private Product products[];
+    private int ammount;
+    private float totalPay;
+    private float actualPay;
     private Date orderDate;
 
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {//把订单和用户关联
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -25,28 +28,28 @@ public class Order {
         this.products = products;
     }
 
-    public int getProductAmmount() {
-        return ProductAmmount;
+    public int getAmmount() {
+        return ammount;
     }
 
-    public void setProductAmmount(int productAmmount) {
-        ProductAmmount = productAmmount;
+    public void setAmmount(int ammount) {
+        this.ammount = ammount;
     }
 
-    public float getTotalPrice() {
-        return totalPrice;
+    public float getTotalPay() {
+        return totalPay;
     }
 
-    public void setTotalPrice(float totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setTotalPay(float totalPay) {
+        this.totalPay = totalPay;
     }
 
-    public float getFinalPay() {
-        return finalPay;
+    public float getActualPay() {
+        return actualPay;
     }
 
-    public void setFinalPay(float finalPay) {
-        this.finalPay = finalPay;
+    public void setActualPay(float actualPay) {
+        this.actualPay = actualPay;
     }
 
     public Date getOrderDate() {

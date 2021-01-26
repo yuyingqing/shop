@@ -1,63 +1,64 @@
+import javafx.scene.control.Tab;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
 public class Test {
-    static Scanner sc = new Scanner(System.in);
-    /*
-    创建一个购物车的数组：存的是商品
-     */
     static Product carts[] = new Product[3];//创建购物车（用数组模拟）
+    static int count = 0;
 
-    public static void main(String[] args) throws ClassNotFoundException, IOException {
-        boolean bo = true;
-        while (bo) {
+    public static void main(String[] args) throws ClassNotFoundException {
+        boolean bool = true;
+        while (bool) {
             System.out.println("请输入用户名：");
+            Scanner sc = new Scanner(System.in);
             String username = sc.next();//阻塞方法
+
             System.out.println("请输入密码：");
             String password = sc.next();
 
-            //File file = new File("C:\\Users\\Administrator\\IdeaProjects\\ConsoleShop\\src\\users.xlsx");
-            InputStream in = Class.forName("Test").getResourceAsStream("/users.xlsx");
-            InputStream inProduct = Class.forName("Test").getResourceAsStream("/product.xlsx");
+            //File file=new File("C:\\Users\\Administrator\\IdeaProjects\\ConsoleShop\\src\\users.xlsx");
+            InputStream in = Class.forName("Test").getResourceAsStream("/users.xlsx");//  /表示的就是classpath
             ReadUserExcel readExcel = new ReadUserExcel();//创建对象
-            User users[] = readExcel.readExcel(in);
+            User users[] = readExcel.getAllUser(in);
             for (int i = 0; i < users.length; i++) {
                 if (username.equals(users[i].getUsername()) && password.equals(users[i].getPassword())) {
-                    System.out.println("登录成功");
-                    bo = false;
-                    /*
-                    显示商品
-                     */
+                    bool = false;
                     while (true) {
-                        System.out.println("购买商品请按 1：");
-                        System.out.println("查看购物车请按 2：");
-                        System.out.println("结账请按 3：");
-                        System.out.println("退出请按 4：");
+                        System.out.println("查看购物车请按1");
+                        System.out.println("购物请按2");
+                        System.out.println("结账请按3");
+                        System.out.println("退出请按4");
                         int choose = sc.nextInt();
                         if (choose == 1) {
-                            shopping(inProduct);
-                        } else if (choose == 2) {
                             viewCarts();
-                        }
-                        else if(choose==3){
-                            Order order=new Order();
-                            order.setUser(users[i]);
-                            order.setProducts(carts);
+                        } else if (choose == 2) {
+                            shopping(sc);//购物
+                        } else if (choose == 3) {
                             /*
-                            统计每个商品的数量,并写入Excel
+                            1、产生订单（必须有订单类）
+                            2、用POI创建Order.xlsx文件
+                            3、把购物车里的商品写入Order.xlsx文件
                              */
-                            int count1[][];
-                            for(int k=0;k<carts.length;k++)
-                            {
-                                for(int q=k+1;q<carts.length;q++){
-
+                            Order order = new Order();
+                            order.setUser(users[i]);//订单关联用户
+                            Product products[]=new Product[count];
+                            int num=0;
+                            /*
+                            实际买了2个商品，怎样把carts中的2个Product对象放入products
+                             */
+                            for(int j=0;j<carts.length;j++){
+                                if(carts[j]!=null){
+                                    products[j]=carts[j];
                                 }
                             }
-                        }
-                        else if (choose == 4) {
-                            break;
+                            order.setProducts(products);//订单关联商品：实际上应该进行处理，把数组中为null的去除
+                            //下订单（创建Excel）
+
+                            CreateOrder.createOrder(order);
+
+                        } else if (choose == 4) {
+                            break;//最终导致循环结束，循环结束后，main方法结束（main线程），JavaVM也会结束
                         }
                     }
                     break;
@@ -69,38 +70,39 @@ public class Test {
     }
 
     public static void viewCarts() {
-        System.out.println("当前购物车商品如下：");
-        for (Product p : carts) {
-            if (p != null) {
-                System.out.print(p.getpId());
-                System.out.print("\t" + p.getpName());
-                System.out.print("\t" + p.getPrice());
-                System.out.println("\t" + p.getpDesc());
+        for (Product product : carts) {
+            if (product != null) {
+                System.out.print(product.getId());
+                System.out.print("\t" + product.getName());
+                System.out.print("\t\t" + product.getPrice());
+                System.out.println("\t\t" + product.getDesc());
             }
         }
     }
 
-    public static void shopping(InputStream in) throws ClassNotFoundException {
+    public static void shopping(Scanner sc) throws ClassNotFoundException {
+        InputStream inPro = Class.forName("Test").getResourceAsStream("/product.xlsx");//  /表示的就是classpath
         ReadProductExcel readProductExcel = new ReadProductExcel();
-        Product products[] = readProductExcel.readExcel(in);
+        Product products[] = readProductExcel.getAllProduct(inPro);
         for (Product product : products) {
-            System.out.print(product.getpId());
-            System.out.print("\t" + product.getpName());
-            System.out.print("\t" + product.getPrice());
-            System.out.println("\t" + product.getpDesc());
+            System.out.print(product.getId());
+            System.out.print("\t" + product.getName());
+            System.out.print("\t\t" + product.getPrice());
+            System.out.println("\t\t" + product.getDesc());
         }
-        System.out.println("请输入商品ID把该商品加入购物车");
-        String pId = sc.next();
-        int count = 0;
         /*
-        根据此ID去Excel中去查找是否有该ID的商品信息，如果有则返回该商品即可
+        遍历数组
          */
-        in = null;
-        in = Class.forName("Test").getResourceAsStream("/product.xlsx");
-        Product product = readProductExcel.getProductById(pId, in);
-        System.out.println("要购买的商品价格：" + product.getPrice());
+        System.out.println("请输入商品ID，把该商品加入购物车：");
+        String pId = sc.next();
+        ReadProductExcel readProductExcel1 = new ReadProductExcel();
+        inPro = null;
+        inPro = Class.forName("Test").getResourceAsStream("/product.xlsx");//  /表示的就是classpath
+        Product product = readProductExcel1.getProductById(pId, inPro);
         if (product != null) {
-            // System.out.println("找到了该商品");
+            /*
+            把商品加入购物车
+             */
             carts[count++] = product;
         }
     }
